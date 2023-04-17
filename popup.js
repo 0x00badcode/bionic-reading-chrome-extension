@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const longWordsLengthInput = document.getElementById('longWordsLength');
     const saveOptionsButton = document.getElementById('saveOptions');
     const toggleExtensionInput = document.getElementById('toggleExtension');
+    const statusIndicator = document.getElementById('statusIndicator');
   
     // Load the options from storage and update the inputs
     chrome.storage.sync.get(
@@ -47,7 +48,17 @@ document.addEventListener('DOMContentLoaded', function() {
           shortWordsLength,
           mediumWordsLength,
           longWordsLength,
+        }, function() {
+          statusIndicator.textContent = 'Options saved.';
+          setTimeout(function() {
+            statusIndicator.textContent = '';
+          }, 1000);
         });
+      } else {
+        statusIndicator.textContent = 'Please enter valid values.';
+        setTimeout(function() {
+          statusIndicator.textContent = '';
+        }, 1000);
       }
     });
   
@@ -56,19 +67,19 @@ document.addEventListener('DOMContentLoaded', function() {
       data.extensionEnabled ? enableExtension() : disableExtension();
       toggleExtensionInput.checked = data.extensionEnabled;
     });
+  
+    // Enable the extension by injecting a content script into the active tab
+    function enableExtension() {
+      chrome.tabs.executeScript({
+        file: 'content.js',
+      });
+    }
+  
+    // Disable the extension by removing the injected content script from the active tab
+    function disableExtension() {
+      chrome.tabs.executeScript({
+        code: 'document.querySelectorAll(".typoglycemia-bold").forEach((el) => el.outerHTML = el.innerText)',
+      });
+    }
   });
-  
-  // Enable the extension by injecting a content script into the active tab
-  function enableExtension() {
-    chrome.tabs.executeScript({
-      file: 'content.js',
-    });
-  }
-  
-  // Disable the extension by removing the injected content script from the active tab
-  function disableExtension() {
-    chrome.tabs.executeScript({
-      code: 'document.querySelectorAll("b").forEach((el) => el.replaceWith(el.innerText))',
-    });
-  }
   
