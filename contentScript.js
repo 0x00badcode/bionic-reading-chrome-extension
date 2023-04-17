@@ -11,7 +11,7 @@ function applyEmphasisRules(word) {
   }
   
   function typoglycemiaTransform(text) {
-    return text.replace(/\b\w+\b/g, applyEmphasisRules);
+    return text.replace(/\b[a-zA-Z]+\b/g, applyEmphasisRules);
   }
   
   function processNode(node) {
