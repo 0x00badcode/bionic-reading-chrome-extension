@@ -4,29 +4,31 @@
     "version": "1.0",
     "description": "Transforms all text on the page using the typoglycemia technique.",
     "permissions": [
-        "activeTab",
-        "scripting",
-        "storage"
+      "activeTab",
+      "scripting",
+      "storage"
     ],
     "action": {
-        "default_popup": "popup.html",
-        "default_icon": {
-            "16": "icon16.png",
-            "48": "icon48.png",
-            "128": "icon128.png"
-        }
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+      }
     },
+    "options_page": "options.html",
     "content_scripts": [
-        {
-            "matches": [
-                "*://*/*"
-            ],
-            "js": [
-                "contentScript.js"
-            ],
-            "css": [
-                "typoglycemia.css"
-            ]
-        }
+      {
+        "matches": [
+          "*://*/*"
+        ],
+        "js": [
+          "contentScript.js"
+        ],
+        "css": [
+          "typoglycemia.css"
+        ]
+      }
     ]
-}
+  }
+  
