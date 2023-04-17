@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Typoglycemia Extension Options</title>
     <!-- Icon Designed by Wannapik https://www.wannapik.com/vectors/74610 -->
-    <style>
-      button {
-        display: block;
-        margin: 10px;
-      }
-    </style>
+    <link rel="stylesheet" href="popup.css">
   </head>
   <body>
-    <button id="toggleExtension">Toggle Extension</button>
+    <h1>Typoglycemia Options</h1>
+    <div class="option">
+      <label for="shortWordsLength">Short Words Length:</label>
+      <input type="number" id="shortWordsLength" min="1" max="4">
+    </div>
+    <div class="option">
+      <label for="mediumWordsLength">Medium Words Length:</label>
+      <input type="number" id="mediumWordsLength" min="5" max="6">
+    </div>
+    <div class="option">
+      <label for="longWordsLength">Long Words Length:</label>
+      <input type="number" id="longWordsLength" min="7">
+    </div>
+    <div class="option">
+      <label for="toggleExtension">Enable/Disable Typoglycemia:</label>
+      <label class="switch">
+        <input type="checkbox" id="toggleExtension">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <button id="saveOptions">Save</button>
     <script src="popup.js"></script>
   </body>
 </html>

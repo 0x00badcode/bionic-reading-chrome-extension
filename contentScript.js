@@ -1,4 +1,4 @@
-function applyEmphasisRules(word) {
+function applyEmphasisRules(word, shortWordsLength, mediumWordsLength, longWordsLength) {
     const length = word.length;
 
     if (length <= 4) {
@@ -10,17 +10,21 @@ function applyEmphasisRules(word) {
     }
 }
 
-function typoglycemiaTransform(text) {
-    return text.replace(/\b[a-zA-Z]+\b/g, applyEmphasisRules);
+function typoglycemiaTransform(text, shortWordsLength, mediumWordsLength, longWordsLength) {
+    return text.replace(/\b[a-zA-Z]+\b/g, (word) =>
+        applyEmphasisRules(word, shortWordsLength, mediumWordsLength, longWordsLength)
+    );
 }
 
-function processNode(node) {
+function processNode(node, shortWordsLength, mediumWordsLength, longWordsLength) {
     if (node.nodeType === Node.TEXT_NODE) {
         const span = document.createElement('span');
-        span.innerHTML = typoglycemiaTransform(node.textContent);
+        span.innerHTML = typoglycemiaTransform(node.textContent, shortWordsLength, mediumWordsLength, longWordsLength);
         node.replaceWith(span);
     } else if (node.nodeType === Node.ELEMENT_NODE) {
-        Array.from(node.childNodes).forEach(processNode);
+        Array.from(node.childNodes).forEach((childNode) =>
+            processNode(childNode, shortWordsLength, mediumWordsLength, longWordsLength)
+        );
     }
 }
 
@@ -30,8 +34,29 @@ function isGoogleSearchPage() {
     return googleSearchPattern.test(url);
 }
 
-chrome.storage.sync.get('enabled', ({ enabled }) => {
-    if (enabled && !isGoogleSearchPage()) {
-        processNode(document.body);
+chrome.storage.sync.get(
+    {
+        shortWordsLength: 1,
+        mediumWordsLength: 2,
+        longWordsLength: 3,
+        extensionEnabled: true,
+    },
+    function (data) {
+        if (data.extensionEnabled && !isGoogleSearchPage()) {
+            processNode(document.body, data.shortWordsLength, data.mediumWordsLength, data.longWordsLength);
+        }
+    }
+);
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (message.action === 'toggleExtension') {
+        if (message.value === true) {
+            processNode(document.body);
+        } else {
+            document.querySelectorAll('span.typoglycemia-bold').forEach((el) => {
+                el.outerHTML = el.innerHTML;
+            });
+        }
     }
 });
+
