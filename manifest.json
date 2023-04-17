@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Typoglycemia Text Transformer",
-    "version": "1.0",
-    "description": "Transforms all text on the page using the typoglycemia technique.",
+    "name": "Bionic Reading Text Transformer",
+    "version": "0.0.1",
+    "description": "Transforms all text on the page using the Bionic Reading technique.",
     "permissions": [
         "activeTab",
         "scripting",
