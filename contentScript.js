@@ -4,17 +4,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const nonNumericPattern = /^[a-zA-Z]+$/;
 
         if (length <= 4 && nonNumericPattern.test(word)) {
-            return `<span class="typoglycemia-bold">${word.slice(0, shortWordsLength)}</span>${word.slice(
-                shortWordsLength
-            )}`;
+            return `<b>${word.slice(0, shortWordsLength)}</b>${word.slice(shortWordsLength)}`;
         } else if (length <= 6 && nonNumericPattern.test(word)) {
-            return `<span class="typoglycemia-bold">${word.slice(0, mediumWordsLength)}</span>${word.slice(
-                mediumWordsLength
-            )}`;
+            return `<b>${word.slice(0, mediumWordsLength)}</b>${word.slice(mediumWordsLength)}`;
         } else if (length > 6 && nonNumericPattern.test(word)) {
-            return `<span class="typoglycemia-bold">${word.slice(0, longWordsLength)}</span>${word.slice(
-                longWordsLength
-            )}`;
+            return `<b>${word.slice(0, longWordsLength)}</b>${word.slice(longWordsLength)}`;
         } else {
             return word;
         }
@@ -28,32 +22,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (/^[a-zA-Z]+$/.test(word)) {
                     words[i] = applyEmphasisRules(word, shortWordsLength, mediumWordsLength, longWordsLength);
                 }
-                node.textContent = words.join('');
             }
+            node.textContent = words.join('');
         } else if (node.nodeType === Node.ELEMENT_NODE) {
             Array.from(node.childNodes).forEach((childNode) =>
                 processNode(childNode, shortWordsLength, mediumWordsLength, longWordsLength)
             );
         }
     }
+
     function isGoogleSearchPage() {
         const url = window.location.href;
         const googleSearchPattern = /^https:\/\/(www\.)?google\..+\/search/;
         return googleSearchPattern.test(url);
     }
 
-    chrome.storage.sync.get(
-        {
-            shortWordsLength: 1,
-            mediumWordsLength: 2,
-            longWordsLength: 3,
-            extensionEnabled: true,
-        },
-        function (data) {
-            if (data.extensionEnabled && !isGoogleSearchPage()) {
-                processNode(document.body, data.shortWordsLength, data.mediumWordsLength, data.longWordsLength);
-            }
+    // Listen for messages from the popup
+    chrome.runtime.onConnect.addListener(function (port) {
+        if (port.name === 'typoglycemia') {
+            port.onMessage.addListener(function (message) {
+                if (message.type === 'toggle') {
+                    if (message.enabled) {
+                        processNode(document.body, shortWordsLength, mediumWordsLength, longWordsLength);
+                    } else {
+                        Array.from(document.querySelectorAll('.typoglycemia-bold')).forEach(function (element) {
+                            const textNode = document.createTextNode(element.textContent);
+                            element.parentNode.replaceChild(textNode, element);
+                        });
+                    }
+                }
+            });
         }
-    );
+    });
 
 });
